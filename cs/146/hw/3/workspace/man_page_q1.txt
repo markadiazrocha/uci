@@ -1,0 +1,29 @@
+Mark Diaz
+28954612
+
+Q1) lss
+	
+	(a) "lss" with no arguments performs as "ls -l" would.
+
+	(b) "lss" is able handle all of "ls"'s options without messing
+		up the sort on byte size. But sort options like -t (sort by time) 
+		will allow user to overwite the default -S (byte sort).  
+
+	(c) To make sure directories are not descended and that "lss" performs
+		correctly with or without filenames, my "lss" goes through the 
+		arguments passed and sets a flag if at least one directory or file 
+		was specified, if so then the "ls -lS" with option "-d" is included 
+		into the "lss" command. If no directory or file  was found in 
+		the passed arguments, then the command remains as "ls -lS" plus 
+		what ever options were passed. Having these condition checks will
+		make sure that if no files or directories were passed, just options,
+		the output will still show the contents of the current working 
+		directory. 
+
+	(d) To keep the implimentation simple, clean, and correct, all the 
+		arguments that are passed to "lss" are simply fed to "ls" 
+		with all error messages redirected to /dev/null. If "ls $@" fails
+		it will be caught when the exit code is checked; from here I print
+		an error message that something went wrong. If no failure then no
+		error message is printed and the correct output should be 
+		displayed on the terminal.

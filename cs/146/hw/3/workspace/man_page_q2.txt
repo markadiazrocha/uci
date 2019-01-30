@@ -1,0 +1,72 @@
+Mark Diaz
+28954612
+
+***** HELPER SCRIPT: _check_trash.sh
+	- This helper script is sourced at the beginning of each of the scripts 
+	below. This is so that the var "trashcan_path" that is defined inside
+	of _check_trash.sh can be accessible to the current shell. When 
+	_check_trash.sh finsihes running, the trashcan path will be stored inside
+	"trashcan_path" and exported. _check_trash.sh checks to see if $TRASH
+	has been defined and if $TRASH directory exists. If both of these
+	conditions are NOT met then "trashcan/" directory will automatically be
+	generated inside of home directory, "~/". If at some point after 
+	"~/trashcan/" was already automatically generated, and the user decides
+	to define $TRASH and create the directory $TRASH, then once 
+	_check_trash.sh is sourced again it will move all the srm'd files from 
+	"~/trashcan/" to $TRASH and delete "~/trashcan/". However, If $TRASH
+	was initially defined  and the directory $TRASH existed before 
+	"~/trashcan/" was  created, then "trashcan_path" would just be set to
+	$TRASH. 
+
+Q2) srm
+	- Just a simple "mv" command to the trashcan_path. Instead of calling
+	exec on /bin/rm when options are passed, the options are passed to mv. 
+	If the options are valid then "srm" will perform fine, if any arguments 
+	are invalid then it will fail gracefully and print an error message
+	to the terminal. The reason why exec was not called on /bin/rm is 
+	because if srm is to "safely" remove files then it should never call
+	/bin/rm for any reason. It would be very misleading to call srm with 
+	options thinking that files are safely removed but in fact were 
+	permanently deleted. 
+	
+Q2) unrm
+	- First checks to see if any arguments were passed, if not then an 
+	error message will print to the screen. If only options were passed
+	without valid filenames and or valid directory names, then the script
+	will fail gracefully and print an error message. "unrm" accepts all the
+	options that are valid for "mv"; although the user will probably not be
+	using them, it keeps the implimentation simple. Now regarding hew files
+	and directories should be passed to unrm: files and directories should
+	only be specified by their names, no path should be included anywhere
+	before the name, if a path is included then "unrm" will not be able to 
+	find the file or directory in trashcan because the names will not match. 
+	However, the user can include a relative path name if they want to delete
+	a specific file of directory within a subdirectory inside trashcan. For 
+	example given: trashcan/[ file1, sub_dir, file2 ] --  everything inside
+	brackets is inside of trashcan/ -- if the user wants to delete a specific
+	file within "sub_dir" then it can specify a rlative path like this: 
+	"sub_dir/specific_file.txt". And if they want to delete anything as a 
+	whole within trashcan then the user would just specify the name
+	"sub_dir" or "sub_dir/". All unremoved files will be stored in the 
+	current working directory inside a folder called "restored". If the 
+	folder "restored" does not exist then it will be created automatically.
+
+Q2) lsrm
+	- If any arguments are passed it will fail gracefuly and print an
+	error message. Else, it will exec "ls -lF" on the trashcan. I added
+	the option -F to classify the contents in order to discern between file
+	types and directory types. If this command fails than it will also 
+	print an error message.
+
+Q2) durm
+	- If any arguments are passed it will fail gracefuly and print an
+	error message. Else, it will exec "du" on the trashcan. If this command 
+	fails than it will also print an error message.
+
+Q2) trash
+	- If any arguments are passed it will fail gracefuly and print an
+	error message. Will perform "rm -rf" on "trashcan/*", removing
+	evrything within "trashcan/" but not "trashcan/" itself. If trashcan 
+	is empty or "rm" command fails, it will print an error message. 
+
+
