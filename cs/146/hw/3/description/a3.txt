@@ -1,1 +1,79 @@
+                                CS146
+                                =====
+                              Assignment #3
+                    Due Tue May 02 at beginning of lecture
 
+
+1.  The "lss" command written in the previous assignment didn't take
+    any arguments.  Re-write it so that it will work if given command
+    line arguments.  More specifically:
+
+    (a) If given no arguments, "lss" should give a "ls -l" listing sorted
+        by decreasing byte count.
+    (b) It should accept as many of "ls"'s options as it can, and pass those
+        options on to "ls".  But be careful; options like "-s", "-i", or "-g"
+        may really foul up your sorting if you try to accept them.  It is OK
+        to decide not to accept options like that, if you think it would be
+        too hard, messy, or inefficient to support them.  Any option not
+        accepted should cause "lss" to print an error message and halt.
+        (Document your decisions and reasons behind them.)  Note that if
+        there are options, but no filenames, then it should work as in (a),
+        but additionally with the options passed to "ls".
+    (c) Any other arguments should be interpreted as filenames, and *only*
+        those filenames listed should be processed.  Directories should NOT
+        be descended unless the files inside those directories are explicitly
+        listed.
+    (d) It should be as "bulletproof" as possible.  It should either print
+        the list in the required order, or fail gracefully.  THIS IS IMPORTANT.
+        
+    Here are some examples, executed in ~wayne/pub/ics54/a3.lss.dir
+    $ ls -l
+    total 2
+    drwxr-xr-x   2 wayne         512 Sep 25 23:58 dir
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 file
+    lrwxrwxrwx   1 wayne           4 Sep 25 23:58 symlink -> file
+    $ lss
+    drwxr-xr-x   2 wayne         512 Sep 25 23:58 dir
+    lrwxrwxrwx   1 wayne           4 Sep 25 23:58 symlink -> file
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 file
+    total 2
+    $ lss -L
+    drwxr-xr-x   2 wayne         512 Sep 25 23:58 dir
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 file
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 symlink
+    total 3
+    $ lss *
+    drwxr-xr-x   2 wayne         512 Sep 25 23:58 dir
+    lrwxrwxrwx   1 wayne           4 Sep 25 23:58 symlink -> file
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 file
+    $ lss */*
+    -rw-r--r--   1 wayne          22 Sep 25 23:58 dir/file2
+    $ lss * */*
+    drwxr-xr-x   2 wayne         512 Sep 25 23:58 dir
+    -rw-r--r--   1 wayne          22 Sep 25 23:58 dir/file2
+    lrwxrwxrwx   1 wayne           4 Sep 25 23:58 symlink -> file
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 file
+    $ lss -L * */*
+    drwxr-xr-x   2 wayne         512 Sep 25 23:58 dir
+    -rw-r--r--   1 wayne          22 Sep 25 23:58 dir/file2
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 file
+    -rw-r--r--   1 wayne           3 Sep 25 23:59 symlink
+
+
+
+
+
+2.  Some people complain that Unix doesn't have an "un-delete" program.  Write a suite of shell scripts called "srm", "unrm", "lsrm", "durm", and "trash".  "srm" is a "safe" version of "rm" --- rather than actually removing files, it moves them to a safe place; "unrm" un-removes a file if it hasn't been trashed; and "trash" actually removes all files that are currently safe-rm'd, recovering the disk space.  "lsrm" takes no arguments and performs "ls -l" on all files that are currently in the trash, and "durm" runs "du" on the trashcan to let you know how much disk space would be recovered by running "trash".  If "srm" is invoked with a directory, then the entire directory heirarchy should be safe-rm'd.  (But it's not necessary to be able to "unrm" individual files in a srm'd directory; being able to unrm the entire heirarchy, as a whole, is good enough.  In other words, you only need to be able to "unrm" names that were explicitly srm'd.)  Furthermore, if "srm" is called on a path, it is not necessary to remember the entire path; in that case, "unrm" should only work with the current directory.  If "srm" is called with any options, you may simply exec the regular /bin/rm.  "trash", "lsrm", and "durm" take no arguments.  Both "srm" and "unrm" may be called with many arguments, eg "srm *".  (But of course "unrm" won't usually be called with "*" --- why?)
+
+        You should try to make them reasonably fast; if an "srm" takes too long, and you are the impatient type (as most programmers are), then you are unlikely to use it regularly.  Thus design is important.  Two obvious possible designs are: (1) have a single, global, safe-rm directory where all srm'd files go; (2) leave srm'd files in the directory in which they lived, but "hide" them somehow.  The design is up to you.  Your mark will depend good design and implementation decisions.  (It is possible to do a good job using either of the above suggested designs, or you can even think of an entirely new one if you want).  You should clearly document each design decision and reasons behind it, and what advantages and disadvantages it has compared to others.
+
+        Some other things to think about: what do you do if "srm" is called on a filename that is already srm'd?  Does the old srm'd file get trashed?  (For this assignment, that would be OK, but a production version, if you were going to release it to the general Unix community, would probably need versions of srm'd files.)  Comment on any important design decisions (like this one) that you make.  Make sure you think carefully; there are easy ways to do this question, and hard ways.
+
+Hints for #2: define an environment valiable (at login time, in your .login or .profile) called TRASH which tells the scripts where to find the trashcan(s);think about how this variable would need to be changed if somebody else ran them; the scripts should fail gracefully if TRASH is not defined; think about how they would work (or fail) if the trashcan resides on a different partition than the files being srm'd (especially if the file being srm'd is very big).
+
+Notes:
+Questions 1 and 2 are worth equal value.
+
+You scripts should be well commented within, and you must also provide external documentation similar to a Unix "man" page for each command.  (Question number 2 can have a single man page for all commands.)
+
+All scripts and documentation must be submitted electronically using the "submit" command described in assignment 2.  Your late penalty will be calculated on the submission date/time.
